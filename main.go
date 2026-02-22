@@ -13,6 +13,8 @@ import (
 	"github.com/prometheus/common/version"
 	"github.com/prometheus/exporter-toolkit/web"
 	"github.com/prometheus/exporter-toolkit/web/kingpinflag"
+
+	"github.com/dswarbrick/ceph_exporter/osd"
 )
 
 func main() {
@@ -32,6 +34,9 @@ func main() {
 	logger := promslog.New(promslogConfig)
 
 	prometheus.MustRegister(versioncollector.NewCollector("ceph_exporter"))
+
+	osdCollector := osd.NewOSDCollector(logger)
+	prometheus.MustRegister(osdCollector)
 
 	http.Handle(*metricsPath, promhttp.Handler())
 
