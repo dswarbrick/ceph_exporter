@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/alecthomas/kingpin/v2"
+	"github.com/prometheus/client_golang/prometheus"
+	versioncollector "github.com/prometheus/client_golang/prometheus/collectors/version"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/promslog"
 	"github.com/prometheus/common/promslog/flag"
@@ -28,6 +30,8 @@ func main() {
 	kingpin.HelpFlag.Short('h')
 	kingpin.Parse()
 	logger := promslog.New(promslogConfig)
+
+	prometheus.MustRegister(versioncollector.NewCollector("ceph_exporter"))
 
 	http.Handle(*metricsPath, promhttp.Handler())
 
