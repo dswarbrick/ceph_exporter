@@ -3,6 +3,11 @@ package asok
 import (
 	"encoding/binary"
 	"net"
+	"time"
+)
+
+var (
+	clientTimeout = 10 * time.Second
 )
 
 type AdminSocketClient struct {
@@ -23,12 +28,13 @@ func (c *AdminSocketClient) DoRequest(command string) (string, error) {
 	}
 	defer conn.Close()
 
-	// TODO: add read / write timeouts.
+	_ = conn.SetWriteDeadline(time.Now().Add(clientTimeout))
 	if _, err := conn.Write([]byte(cString(command))); err != nil {
 		return "", err
 	}
 
 	msgSizeRaw := [4]byte{}
+	_ = conn.SetReadDeadline(time.Now().Add(clientTimeout))
 	if _, err := conn.Read(msgSizeRaw[:]); err != nil {
 		return "", err
 	}
